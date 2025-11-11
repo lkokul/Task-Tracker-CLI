@@ -11,33 +11,47 @@ while True:
         if cmd[0].lower() == "help": tm.help()
         elif cmd[0].lower() in ("exit", "e", "close"): break
 
+        # Adding a new task
         elif cmd[0].lower() == "add":
-            description = input("     Description of the task: ")
-            status = input("     Status of the task: ")
+            if len(cmd) < 2:
+                print("Use: add <task description>")
+                continue
 
-            task = {
-                "description" : description,
-                "status" : status
-            }
-            print(task)
+            description = " ".join(cmd[1:])
+            obj_task = tm(description=description)
+
+        # Updating and deleting tasks
+        elif cmd[0].lower() == "update":
+            if len(cmd) < 3:
+                print("Use: update <task ID> <new task description>")
+                continue
             
-            obj_task = tm(description=description, status=status)
-            obj_task.add_taks()
+            task_update = {
+                "task_id" : cmd[1],
+                "description" : " ".join(cmd[2:])
+            }
+            tm.update_task(task_update)
         
         elif cmd[0].lower() == "delete":
-            task_name = input("     Name of the task to delete: ")
+            if len(cmd) != 2:
+                print("Use: delete <task ID>")
+                continue
+            del_task = cmd[1]
+            tm.delete_task(del_task)
 
-            task = {
-                "task_name" : task_name,
-                "description" : description,
-                "status" : status
+        # Marking a task as in progress or done        
+        elif cmd[0].lower().split("-")[0] == "mark":
+            if len(cmd) != 2:
+                print("Use: mark-in-progress <task ID>")
+                continue
+            if cmd[0] not in ["mark-in-progress", "mark-done"]: raise Exception("Invalid task status")
+            task_status = {
+                "task_status" : cmd[0],
+                "task_id" : cmd[1]
             }
-            print(task)
-            tm.add_taks(task)
+            tm.mark_a_task(task_status)
+        
 
-        else:
-            tm.help()
-    
     except Exception as e:
         print(e)
 

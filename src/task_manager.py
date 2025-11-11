@@ -1,19 +1,7 @@
-import json
-from datetime import datetime 
+import json, os
+from datetime import datetime
 
-class TaskManager:
-    file_name = "task_register.json"
-    count = 0
-    def __init__(self, description, status):
-        self.id = count
-        self.description = description
-        self.status = status
-        self.createdAt = datetime.now()
-        self.updatedAt= None
-
-        TaskManager.count += 1
-
-    def decorator(self, function):
+def decorator(function):
         def wrapper(*args, **kwargs):
             try:
                 return function(*args, **kwargs)
@@ -21,6 +9,50 @@ class TaskManager:
                 print(e)
 
         return wrapper
+
+class TaskManager:
+    file_name = "task_register.json"
+    def __init__(self, description=None):
+        self.id = self.get_id()
+        self.description = description
+        self.status = None
+        self.createdAt = datetime.now()
+        self.updatedAt= None
+
+        task = {
+            "id": self.id,
+            "description": self.description,
+            "status": self.status,
+            "createdAt": str(self.createdAt),
+            "updatedAt": str(self.updatedAt)
+        }
+
+        # Since it's used file.write it's needed to use a string (dumps turns a dicc into a str)
+        # It could be uploaded to just using dump(dicctionary)
+        # json.dump(task, file, ident)
+        try:
+            contents = self.read_file()
+
+
+        except (FileNotFoundError, json.JSONDecodeError):
+            contents = []
+
+        contents.append(task)
+        self.write_file(contents)
+        print(f'Task added successfully (ID:{task["id"]})')
+
+    @staticmethod
+    def get_id():
+        """This function is used to save and remember the last id, so it doesn't repeat it"""
+        if not os.path.exists(TaskManager.file_name):
+            return 1
+
+        try:
+            contents = TaskManager.read_file()
+            if contents: return max(cont["id"] for cont in contents) + 1
+        
+        except (json.JSONDecodeError, KeyError): pass
+        return 1
 
     @classmethod
     @decorator
@@ -30,30 +62,63 @@ class TaskManager:
             - help
             - exit
 
-            - add
-            - modify
-            - delete
+            - add <task description>
+            - update <task ID> <new task description>
+            - delete <task ID>
+            
+            - mark-in-progress <task ID>
+            - mark-done <task ID>
             ''')
 
-    def add_taks(self):
-        """Writes a task into task_register file"""
+    @classmethod
+    def read_file(cls):
+        with open(TaskManager.file_name, "r") as file:
+            return json.load(file)
+
+    @classmethod
+    def write_file(cls, contents):
         with open(TaskManager.file_name, "w") as file:
-            task = {
-                "id": self.id,
-                "description": self.description,
-                "status": self.status,
-                "createdAt": self.createdAt,
-                "updatedAt": self.updatedAt
-            }
-            file.write(json.dump(task)) # We use dump or load to write into an archive or to read it
-        print(f'Task added successfully (ID:{task["id"]})')
+            json.dump(contents, file, indent=2)
 
-    def modify_taks(self):
-        """Modifies a task from task_register file"""
-        with open(file_name, "w") as file:
-            file.write(json.dumps(task))
+    @classmethod
+    @decorator
+    def update_task(cls, update_task):
+        """"Updates a task description"""
+        """Is made as a classmethod because we don't use an especific object, we just use the class"""
+        task_id = int(update_task.get("task_id"))
+        description = update_task.get("description")
 
-    def delete_taks(self):
-        """Deletes a task from task_register file"""
-        with open(file_name, "w") as file:
-            file.write(json.dumps(task))
+        contents = TaskManager.read_file()
+
+        for cont in contents:
+            if cont["id"] == task_id:
+                cont["description"] = description
+                print(f'Task updated successfully (ID:{cont["id"]})')
+
+        TaskManager.write_file(contents)
+
+    @classmethod
+    @decorator
+    def delete_task(cls, del_task):
+        """Deletes a task"""
+        """Is made as a classmethod because we don't use an especific object, we just use the class"""
+        contents = TaskManager.read_file()
+
+        print(f'Task deleted successfully (ID:{cont["id"]})')           
+        contents = [cont for cont in contents if cont["id"] != int(del_task)]
+
+        TaskManager.write_file(contents)
+
+    @classmethod
+    @decorator
+    def mark_a_task(cls, task):
+        task_id = task.get("task_id")
+        task_status = task.get("task_status")
+        contents = TaskManager.read_file()
+
+        for cont in contents:
+            if cont["id"] == int(task_id):
+                cont["status"] = task_status
+                print(f'Task updated successfully (ID:{cont["id"]})')
+
+        TaskManager.write_file(contents)
