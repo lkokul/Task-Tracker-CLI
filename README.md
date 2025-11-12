@@ -2,6 +2,7 @@
 
 A simple command-line tool to manage tasks directly from the terminal.
 
+> This project was built following the [Task Tracker project guide on roadmap.sh](https://roadmap.sh/projects/task-tracker).
 ---
 
 ## How to Run
