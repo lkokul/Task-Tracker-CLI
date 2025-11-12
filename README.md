@@ -1,41 +1,79 @@
 # Task-Tracker-CLI
 
-## To initiate:
+A simple command-line tool to manage tasks directly from the terminal.
+
+---
+
+## How to Run
+
 ```bash
 python main.py
-task-cli > function
+````
+
+Once running, the prompt will appear as:
+
+```
+task-cli >
 ```
 
-> [!NOTE]
-> There's a `help` function which shows all functions and parameters needed for each<br>
-> In case you don´t use an existing function it will call help function<br>
-> If you call a correct function but don't use correct parameters it will show you a message showing the correct use of that function<br>
-> When python main.py it will show at the beginning of each line "task-cli > "
+You can then type any of the following commands.
 
-> [!WARNING]
-> Functions available:
-> - help
-> - exit
-> 
-> - add <task description>
-> - update <task ID> <new task description>
-> - delete <task ID>
-> - list [done/todo/in-progress]
-> 
-> - mark-in-progress <task ID>
-> - mark-done <task ID>
+---
 
-Example of use:
-```
+> [!Notes]
+
+> Use the `help` command to display all available functions and their parameters.  
+> If you call a **non-existing function**, the program automatically shows the help message.  
+> If you call a **valid function** but use **incorrect parameters**, the CLI will display the correct usage.  
+
+---
+
+## Available Commands
+
+| Command                              | Description                            |
+| ------------------------------------ | -------------------------------------- |
+| `help`                               | Show all commands and usage info       |
+| `exit`                               | Exit the CLI                           |
+| `add <task description>`             | Add a new task                         |
+| `update <task ID> <new description>` | Update an existing task                |
+| `delete <task ID>`                   | Delete a task by ID                    |
+| `list [done/todo/in-progress]`       | List all tasks (or filtered by status) |
+| `mark-in-progress <task ID>`         | Mark a task as in progress             |
+| `mark-done <task ID>`                | Mark a task as done                    |
+
+---
+
+## Examples
+
+```bash
 python main.py
-help
-exit
-add do homework
-update 1 do chores
-delete 1
-list
-list done
-mark-in-progress 1
-mark-done 1
 ```
 
+Then inside the prompt:
+
+```
+task-cli > help
+task-cli > add do homework
+task-cli > update 1 do chores
+task-cli > delete 1
+task-cli > list
+task-cli > list done
+task-cli > mark-in-progress 1
+task-cli > mark-done 1
+task-cli > exit
+```
+
+---
+
+## Notes for Developers
+
+* The CLI automatically validates command parameters.
+* Data is stored in a local JSON file (`task_register.json`).
+* Each task contains:
+
+  * `id` — numeric unique identifier
+  * `description`
+  * `status` (`todo`, `in-progress`, or `done`)
+  * `createdAt` and `updatedAt` timestamps
+
+```
