@@ -45,12 +45,20 @@ while True:
                 print("Use: mark-in-progress <task ID>")
                 continue
             if cmd[0] not in ["mark-in-progress", "mark-done"]: raise Exception("Invalid task status")
+            status = "-".join(cmd[0].lower().split("-")[1:])
             task_status = {
-                "task_status" : cmd[0],
+                "status" : status,
                 "task_id" : cmd[1]
             }
             tm.mark_a_task(task_status)
         
+        # Listing all tasks
+        elif cmd[0].lower() == "list":
+            filter_status = None
+            if len(cmd) == 2:
+                if cmd[1] not in ["in-progress", "done", "todo"]: raise Exception("Invalid task status to filter")
+                filter_status = cmd[1]
+            tm.list_tasks(filter_status)
 
     except Exception as e:
         print(e)

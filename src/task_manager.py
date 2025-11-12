@@ -15,7 +15,7 @@ class TaskManager:
     def __init__(self, description=None):
         self.id = self.get_id()
         self.description = description
-        self.status = None
+        self.status = "todo"
         self.createdAt = datetime.now()
         self.updatedAt= None
 
@@ -65,6 +65,7 @@ class TaskManager:
             - add <task description>
             - update <task ID> <new task description>
             - delete <task ID>
+            - list [done/todo/in-progress]
             
             - mark-in-progress <task ID>
             - mark-done <task ID>
@@ -83,8 +84,10 @@ class TaskManager:
     @classmethod
     @decorator
     def update_task(cls, update_task):
-        """"Updates a task description"""
-        """Is made as a classmethod because we don't use an especific object, we just use the class"""
+        """
+        Updates a task description
+        Is made as a classmethod because we don't use an especific object, we just use the class
+        """
         task_id = int(update_task.get("task_id"))
         description = update_task.get("description")
 
@@ -93,6 +96,7 @@ class TaskManager:
         for cont in contents:
             if cont["id"] == task_id:
                 cont["description"] = description
+                cont["updatedAt"] = str(datetime.now())
                 print(f'Task updated successfully (ID:{cont["id"]})')
 
         TaskManager.write_file(contents)
@@ -100,8 +104,10 @@ class TaskManager:
     @classmethod
     @decorator
     def delete_task(cls, del_task):
-        """Deletes a task"""
-        """Is made as a classmethod because we don't use an especific object, we just use the class"""
+        """
+        Deletes a task
+        Is made as a classmethod because we don't use an especific object, we just use the class
+        """
         contents = TaskManager.read_file()
 
         print(f'Task deleted successfully (ID:{cont["id"]})')           
@@ -112,13 +118,28 @@ class TaskManager:
     @classmethod
     @decorator
     def mark_a_task(cls, task):
+        """
+        Marks a task as done or in-progress, the status may coincide with the filter status of the next function
+        In order to be able to correctly filter the tasks
+        """
         task_id = task.get("task_id")
-        task_status = task.get("task_status")
+        status = task.get("status")
         contents = TaskManager.read_file()
 
         for cont in contents:
             if cont["id"] == int(task_id):
-                cont["status"] = task_status
+                cont["status"] = status
+                cont["updatedAt"] = str(datetime.now())
                 print(f'Task updated successfully (ID:{cont["id"]})')
 
         TaskManager.write_file(contents)
+
+    @classmethod
+    @decorator
+    def list_tasks(cls, filter_status=None):
+        """List taks, if it takes a filer, only shows that status, else it shows all the tasks"""
+        contents = TaskManager.read_file()
+        for cont in contents:
+            if filter_status and cont["status"] == filter_status:
+                print(cont)
+            elif not filter_status: print(cont)
