@@ -7,9 +7,9 @@ task-cli > function
 ```
 
 > [!NOTE]
-> There's a help function which shows all functions and parameters needed for each
-> In case you don´t use an existing function it will call help function
-> If you call a correct function but don't use correct parameters it will show you a message showing the correct use of that function
+> There's a `help` function which shows all functions and parameters needed for each<br>
+> In case you don´t use an existing function it will call help function<br>
+> If you call a correct function but don't use correct parameters it will show you a message showing the correct use of that function<br>
 > When python main.py it will show at the beginning of each line "task-cli > "
 
 > [!WARNING]
